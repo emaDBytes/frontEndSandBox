@@ -25,6 +25,13 @@
       function SimpleTrivia() {
         const [data, setData] = React.useState(null);
         const [isLoading, setIsLoading] = React.useState(false);
+        const [error, setError] = React.useState(null);
+
+        React.useEffect(() => {
+          if (data) {
+            setError(null);
+          }
+        }, [data]);
 
         const fetchTrivia = () => {
           setIsLoading(true);
@@ -32,6 +39,9 @@
             "https://opentdb.com/api.php?amount=1&category=18&type=multiple"
           )
             .then((response) => {
+              if (response.status === 429)
+                throw new Error("Please try again in a moment");
+
               if (!response.ok)
                 throw new Error("Something went wrong: " + response.statusText);
 
@@ -43,13 +53,11 @@
             })
             .catch((error) => {
               console.error(error);
+              setError(error.message);
+              setData(null);
               setIsLoading(false);
             });
         };
-
-        // React.useEffect(() => {
-        //   fetchTrivia();
-        // }, []);
 
         return (
           <React.Fragment>
@@ -57,6 +65,7 @@
             <button onClick={fetchTrivia} disabled={isLoading}>
               {isLoading ? "Loading..." : "New Question"}
             </button>
+            {error && <h2>{error}</h2>}
             {data && <h2>{data.question}</h2>}
           </React.Fragment>
         );
