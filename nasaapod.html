@@ -30,7 +30,7 @@
           fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY")
             .then((Response) => {
               if (!Response.ok)
-                throw new Error("Something went wring: " + Response.statusText);
+                throw new Error("Something went wrong: " + Response.statusText);
 
               return Response.json();
             })
