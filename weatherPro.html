@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weather Plus+ / React</title>
+  </head>
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+      function WeatherPlus() {
+        // State for response data
+        const [data, setData] = React.useState(null);
+        const [error, setError] = React.useState(null);
+        const [city, setCity] = React.useState("");
+
+        const fetchWeather = () => {
+          setData(null);
+          setError(null);
+          // Fetch
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?units=metric&q=${city}&APPID=145672ddd8b1a96bf85057c794a09b01`
+          )
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Something went wrong: " + response.statusText);
+              }
+              return response.json();
+            })
+            .then((responseData) => {
+              console.log("API response:", responseData); // Debug log
+              setData(responseData);
+            })
+            .catch((error) => {
+              console.error("Fetch error:", error); // Debug log
+              setError(error.message);
+            });
+        };
+
+        console.log("Rendering with data:", data); // Debug log
+
+        return (
+          <React.Fragment>
+            <input
+              type="text"
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              placeholder="Enter a city name"
+            />
+            <button onClick={fetchWeather}>Get weather</button>
+            {/*if (error) return <div>Error: {error}</div>;*/}
+            {error && <div>Error: {}eror</div>}
+            {/*if (!data) return <div>Loading...</div>;<h2>London</h2>*/}
+            {!data && !error && <div>Enter a city and click "Get weather"</div>}
+            {data && (
+              <div>
+                <h2>{data.name}</h2>
+                <p>Temperature: {data.main.temp}°C</p>
+                <p>Weather: {data.weather[0].main}</p>
+                <img
+                  src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`}
+                  alt="Weather condition icon"
+                />
+              </div>
+            )}
+          </React.Fragment>
+        );
+      }
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<WeatherPlus />);
+    </script>
+  </body>
+</html>
