@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>GitHub Repos / React</title>
+  </head>
+
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Importing React, ReactDOM, and Babel from external sources for in-browser compilation -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+      // Define the GithubRepos component
+      function GithubRepos() {
+        // Use React's useState hook to create a state variable `listItems` initialized as an empty array
+        const [listItems, setListItems] = React.useState([]);
+
+        // useEffect hook runs when the component is first rendered (empty dependency array `[]`)
+        React.useEffect(() => {
+          // Fetch data from GitHub API (searching repositories related to React)
+          fetch("https://api.github.com/search/repositories?q=react")
+            .then((response) => {
+              // Check if the response is successful
+              if (!response.ok)
+                throw new Error("Error in fetch: " + response.statusText);
+
+              // Convert the response to JSON
+              return response.json();
+            })
+            .then((responseData) => {
+              // Set the `listItems` state with the `items` array from the API response
+              setListItems(responseData.items);
+            })
+            // Catch and log any errors that occur during the fetch
+            .catch((err) => console.error(err));
+        }, []); // Empty array ensures this only runs once (like componentDidMount in class components)
+
+        // Return JSX to render the component's UI
+        return (
+          <React.Fragment>
+            <h2>Repositories</h2>
+            <table>
+              <tbody>
+                <tr>
+                  <th>Name</th>
+                  <th>URL</th>
+                </tr>
+                {/* Map over `listItems` to create a table row for each repository */}
+                {listItems.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.full_name}</td>
+                    {/* Link the repository URL */}
+                    <td>
+                      <a href={item.html_url}>{item.html_url}</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </React.Fragment>
+        );
+      }
+
+      // Find the root div and render the GithubRepos component inside it
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<GithubRepos />);
+    </script>
+  </body>
+</html>
