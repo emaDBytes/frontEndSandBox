@@ -2,12 +2,14 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>GitHub Repos With Input/ React</title>
+    <title>GitHub Repos With Input / React</title>
   </head>
 
   <body>
+    <!-- The root element where the React component will be rendered -->
     <div id="root"></div>
 
+    <!-- Load React & Babel libraries -->
     <script
       src="https://unpkg.com/react@18/umd/react.development.js"
       crossorigin
@@ -18,44 +20,56 @@
     ></script>
     <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
 
+    <!-- React component code -->
     <script type="text/babel">
       function GithubWantedRepos() {
+        // State for holding the list of repositories fetched from GitHub
         const [listItems, setListItems] = React.useState([]);
+        // State to hold the keyword input by the user
         const [keyword, setKeyword] = React.useState("");
 
+        // Function to fetch repositories based on the input keyword
         const fetchRepositoris = () => {
+          // Make a fetch request to GitHub API with the `keyword` in the query
           fetch(`https://api.github.com/search/repositories?q=${keyword}`)
             .then((response) => {
+              // Check if the response is successful
               if (!response.ok)
                 throw new Error("Error in fetch: " + response.statusText);
 
+              // Parse the JSON response
               return response.json();
             })
             .then((responseData) => {
+              // Set the listItems state with the `items` from the response
               setListItems(responseData.items);
             })
+            // Catch and log any errors during the fetch operation
             .catch((err) => console.error(err));
         };
 
         return (
           <React.Fragment>
             <h2>Repositories</h2>
+            {/* Input field to capture the search keyword and update the `keyword` state */}
             <input
               type="text"
               onChange={(event) => setKeyword(event.target.value)}
               placeholder="Programming Language"
             />
-            <button onClick={fetchRepositoris}>Find Repsitories</button>
+            {/* Button to trigger the fetchRepositoris function when clicked */}
+            <button onClick={fetchRepositoris}>Find Repositories</button>
             <table>
               <tbody>
                 <tr>
                   <th>Name</th>
                   <th>URL</th>
                 </tr>
+                {/* Map over `listItems` to display each repository as a table row */}
                 {listItems.map((item) => (
                   <tr key={item.id}>
                     <td>{item.full_name}</td>
-                    {/* Link the repository URL */}
+                    {/* Display a clickable link to the repository */}
                     <td>
                       <a href={item.html_url}>{item.html_url}</a>
                     </td>
@@ -67,6 +81,7 @@
         );
       }
 
+      // Find the root element and render the GithubWantedRepos component inside it
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<GithubWantedRepos />);
     </script>
